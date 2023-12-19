@@ -12,6 +12,12 @@ if (!BASE_URL) {
   throw new Error("BASE_URL is required");
 }
 
+let client = new Infobip({
+  authType: AuthType.ApiKey,
+  baseUrl: BASE_URL ?? "",
+  apiKey: API_KEY,
+});
+
 const recipients = await Bun.file("./recipients.json").json<
   Array<{ name: string; number: string }>
 >();
@@ -27,15 +33,9 @@ const payload = {
     callbackData: JSON.stringify({ foo: "bar" }),
   })),
 };
-
-console.log(JSON.stringify(payload, null, 2));
-
-let client = new Infobip({
-  authType: AuthType.ApiKey,
-  baseUrl: BASE_URL ?? "",
-  apiKey: API_KEY,
-});
+console.log("\nREQUEST:");
+console.log(Bun.inspect(payload, { colors: true }));
 
 const response = await client.channels.sms.send(payload).catch(console.error);
-
-console.log(JSON.stringify(response.data, null, 2));
+console.log("\nRESPONSE:");
+console.log(Bun.inspect(response.data, { colors: true }));
